@@ -5,11 +5,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Django-Setup</title>
+    <title>Welcome to Grove Tennis Club</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}" >
 </head>
 <body>
-    <h1>Hello Django From Heroku</h1>
+    <header>
+        <h1>Grove Tennis Club</h1>
+    </header>
+
+    <main>
+        <p>Welcome to the Tennis Club Booking System!</p>
+        <a href="{% url 'login' %}">Login</a>
+        <a href="{% url 'signup' %}">Sign Up</a>
+    </main>
     
 </body>
 </html>
