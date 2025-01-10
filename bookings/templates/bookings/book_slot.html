@@ -1,19 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book a Slot</title>
-</head>
-<body>
-    <h1>Book a Court Slot</h1>
-    <form method="POST">
-        {% csrf_token %}
-        <div>
-            {{ form.as_p }}
-        </div>
-        <button type="submit">Book</button>
-    </form>
-    <a href="{% url 'home' %}">Back to Home</a>
-</body>
-</html>
+<!-- templates/bookings/book_slot.html -->
+{% extends 'base_generic.html' %}
+
+{% block content %}
+<h1>Book a Court</h1>
+
+{% if courts %}
+  <ul>
+    {% for court in courts %}
+      <li>
+        <h3>Court {{ court.court_number }} ({{ court.court_type }})</h3>
+        
+        <!-- Booking form -->
+        <form method="post" action="{% url 'make_booking' court.id %}">
+          {% csrf_token %}
+          <label for="booking_time">Booking Time:</label>
+          <input type="datetime-local" name="booking_time" required>
+          
+          <label for="duration">Duration (minutes):</label>
+          <input type="number" name="duration" min="30" max="120" required>
+          
+          <button type="submit">Book Court</button>
+        </form>
+        
+        <!-- List existing bookings for the court -->
+        <h4>Existing Bookings:</h4>
+        <ul>
+          {% for booking in bookings %}
+            {% if booking.court == court %}
+              <li>{{ booking.user.username }} - {{ booking.booking_time }} ({{ booking.duration }} mins)</li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No courts available for booking.</p>
+{% endif %}
+
+{% endblock %}
