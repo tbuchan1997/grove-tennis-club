@@ -1,4 +1,3 @@
-<!-- templates/bookings/book_slot.html -->
 {% extends 'base_generic.html' %}
 
 {% block content %}
@@ -10,17 +9,28 @@
       <li>
         <h3>Court {{ court.court_number }} ({{ court.court_type }})</h3>
         
-        <!-- Booking form -->
-        <form method="post" action="{% url 'make_booking' court.id %}">
-          {% csrf_token %}
-          <label for="booking_time">Booking Time:</label>
-          <input type="datetime-local" name="booking_time" required>
-          
-          <label for="duration">Duration (minutes):</label>
-          <input type="number" name="duration" min="30" max="120" required>
-          
-          <button type="submit">Book Court</button>
-        </form>
+        <!-- Display available slots for today -->
+        <h4>Available Slots for Today:</h4>
+        {% if availability_for_today|get_item:court %}
+          <ul>
+            {% for availability in availability_for_today|get_item:court %}
+              <li>
+                {{ availability.start_time }} - {{ availability.end_time }}
+                
+                <!-- Booking form -->
+                <form method="post" action="{% url 'make_booking' court.id %}">
+                  {% csrf_token %}
+                  <input type="hidden" name="availability_id" value="{{ availability.id }}">
+                  <label for="duration">Duration (minutes):</label>
+                  <input type="number" name="duration" min="30" max="120" required>
+                  <button type="submit">Book Slot</button>
+                </form>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p>No available slots for today.</p>
+        {% endif %}
         
         <!-- List existing bookings for the court -->
         <h4>Existing Bookings:</h4>

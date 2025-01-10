@@ -24,8 +24,21 @@ def signup(request):
 
 def book_slot(request):
     courts = Court.objects.all()  # Fetch all courts
+    today_day_of_week = datetime.now().weekday() #Get todays day of the week 
     bookings = Booking.objects.filter(is_active=True)  # Fetch active bookings
     return render(request, 'bookings/book_slot.html', {'courts': courts, 'bookings': bookings})
+    # Dictionary to hold court availability for today
+    availability_for_today = {}
+    for court in courts:
+        # Get the availability for the court for today
+        available_slots = Availability.objects.filter(court=court, day_of_week=today_day_of_week)
+        availability_for_today[court] = available_slots
+
+        # Pass the courts and their availability to book_slot.html
+    return render(request, 'book_slot.html', {
+        'courts': courts,
+        'availability_for_today': availability_for_today
+    })
 
 def make_booking(request, court_id):
     court = Court.objects.get(id=court_id)
