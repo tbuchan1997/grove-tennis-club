@@ -10,6 +10,23 @@ class Court(models.Model):
     def __str__(self):
         return f"Court {self.court_number}"
 
+class Availability(models.Model):
+    court = models.ForeignKey(Court, on_delete=models.CASCADE, related_name='availabilities')
+    day_of_week = models.IntegerField(choices=[
+        (0, 'Monday'),
+        (1, 'Tuesday'),
+        (2, 'Wednesday'),
+        (3, 'Thursday'),
+        (4, 'Friday'),
+        (5, 'Saturday'),
+        (6, 'Sunday')
+    ])
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+
+    def __str__(self):
+        return f"{self.get_day_of_week_display()} from {self.start_time} to {self.end_time} on {self.court}"
+
 class Booking(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     court = models.ForeignKey(Court, on_delete=models.CASCADE)

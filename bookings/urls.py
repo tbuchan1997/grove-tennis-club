@@ -10,4 +10,6 @@ urlpatterns = [
         name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('signup/', views.signup, name='signup'),
+    path('book_slot/', views.book_slot, name='book_slot'),
+    path('make_booking/<int:court_id>/', views.make_booking, name='make_booking'),
 ]
