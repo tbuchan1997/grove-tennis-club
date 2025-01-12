@@ -5,6 +5,10 @@
 {% block content %}
 <h1>Book a Court</h1>
 
+<h2>Debugging Info:</h2>
+<p>Courts: {{ courts }}</p>
+<p>Availability: {{ availability }}</p>
+
 {% if courts %}
   <ul>
     {% for court in courts %}
@@ -13,11 +17,13 @@
         
         <!-- Display available slots for today -->
         <h4>Available Slots for Today:</h4>
-        {% if availability_for_today|get_item:court %}
+        {% if availability %}
           <ul>
-            {% for availability in availability_for_today|get_item:court %}
+            {% for slot in availability %}
+              {% if slot.court == court %}
               <li>
-                {{ availability.start_time }} - {{ availability.end_time }}
+                Day: {{ slot.get_day_of_week_display }}<br>
+                Time: {{ slot.start_time }} - {{ slot.end_time }}
                 
                 <!-- Booking form -->
                 <form method="post" action="{% url 'make_booking' court.id %}">
@@ -28,6 +34,7 @@
                   <button type="submit">Book Slot</button>
                 </form>
               </li>
+              {% endif %}
             {% endfor %}
           </ul>
         {% else %}

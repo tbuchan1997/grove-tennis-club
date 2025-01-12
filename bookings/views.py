@@ -5,7 +5,8 @@ from django.contrib import messages
 from django.utils import timezone
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from .models import Court, Booking, Availability
+from .models import Court, Booking
+from datetime import datetime
 
 # Create your views here.
 
@@ -23,28 +24,15 @@ def signup(request):
     return render(request, 'bookings/signup.html', {'form': form})
 
 def book_slot(request):
-    # Get the list of all courts
-    courts = Court.objects.all()
-    
-    # Get today's day of the week (0-6, where 0 is Monday, 6 is Sunday)
-    today_day_of_week = datetime.now().weekday()
-    
-    # Create a dictionary to hold court availability for today
-    availability_for_today = {}
-    
-    for court in courts:
-        # Get the availability for the court for today
-        available_slots = Availability.objects.filter(court=court, day_of_week=today_day_of_week)
-        availability_for_today[court] = available_slots
-    
-    # Get existing bookings for the courts (optional)
-    bookings = Booking.objects.all()  # Add relevant filters if needed
-    
-    # Pass the courts, availability, and bookings to the template
+    courts = Court.objects.all()  # Fetch all courts
+
+    # Fetch availability slots for today
+    today_day_of_week = datetime.datetime.today().weekday()  # 0 - Monday, 6 - Sunday
+    availability_for_today = Availability.objects.filter(day_of_week=today_day_of_week)
+
     return render(request, 'bookings/book_slot.html', {
         'courts': courts,
-        'availability_for_today': availability_for_today,
-        'bookings': bookings
+        'availability': availability_for_today,
     })
 
 def make_booking(request, court_id):

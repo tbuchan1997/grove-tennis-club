@@ -33,14 +33,4 @@ class Migration(migrations.Migration):
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
         ),
-        migrations.CreateModel(
-            name='Availability',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('day_of_week', models.IntegerField()),
-                ('start_time', models.TimeField()),
-                ('end_time', models.TimeField()),
-                ('court', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='bookings.court')),
-            ],
-        ),
     ]
