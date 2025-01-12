@@ -34,6 +34,7 @@ We're a neighbourhood friendly tennis club, ideal for families, juniors and adul
 * [Deployment](#deployment)
   
 * [Testing](#testing)
+  -[Availabilities](#availability)
 
 * [Learning Points](#learning-points)
   - [Use of AI](#use-of-ai)
@@ -353,9 +354,22 @@ I planned for this site to be accessible and legible on all screen sizes. I will
 
 ### **Testing**    
 
-Testing took place throughout the entire build using Dev Tools on Firefox and on several real-world devices available for simulation on devTools.
+Testing took place throughout the entire build using the Python shell and in built django admin dashboard for the models & views logic. 
 
-Automated tests were written by AI to cover common and fringe cases which may occur.
+#### **Availabilities**
+Using the Python shell to create a slot, setting it to being available for booking by default:
+new_slot = Availability.objects.create(
+   ...:     court_id=1,
+   ...:     day_of_week=0,
+   ...:     start_time=time(9, 0),
+   ...:     end_time=time(10, 0)
+   ...: )
+   ...: print(new_slot.is_available)
+OUTPUT: True
+
+
+
+
 
 ### **Learning Points** 
 
