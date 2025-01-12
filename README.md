@@ -25,6 +25,7 @@ We're a neighbourhood friendly tennis club, ideal for families, juniors and adul
 - [Skeleton](#skeleton)
 - [Surface](#surface)
 - [Design](#design)
+- [Implementation](#implementation)
  
 * [Tablet & Mobile View](#tablet--mobile-view)
  
@@ -279,6 +280,15 @@ These ratios meet or exceed WCAG 2.1 standards for both normal text and large te
 
 Overall, the design was intended and created to be clean, clear and professional, avoiding any unnecessary details/information.
 
+---
+
+#### **Implementation**
+
+- I (eventually) tried to adopt an iterative approach to building out each feature of the website. By focussing on one particular feature and building it out stage by stage I found it helped the work flow and removed the mental barriers to working, as well as making debugging simpler.
+- An example of this iterative approach for the Availability model (which shows the user which Court is available to be booked) is as follows:
+- 1) Add functionality for the admin to manually create availability. 2) Test manually using Python shell. 3) Test manually using admin dashboard. 4) Generate basic automatic tests (with help from AI). 5) Debug (if necessary). 6) Generate automatic tests for edge cases. 7) Debug. 8) Show on template
+- By using this approach, I knew the feature worked at every stage before moving on, so if an error emerged I knew exactly where to focus on for bug fixes.
+- By separating each feature and building in isolation, I anticipate it will make integrating the whole project together to be a smoother process, as I will be confident that each feature works as intended.
 
 ---
 
@@ -288,7 +298,6 @@ Overall, the design was intended and created to be clean, clear and professional
 
 - To ensure responsivity I intend to use the Bootstrap grid to keep the website looking clean on all screen sizes.
   
-
 ---  
 
 ## **Testing**
