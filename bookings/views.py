@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.utils import timezone
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from .models import Court, Booking
+from .models import Court, Booking, Availability
 from datetime import date
 
 # Create your views here.
@@ -26,11 +26,16 @@ def signup(request):
 def book_slot(request):
     courts = Court.objects.all()  # Fetch all courts
 
+
     # Fetch availability slots for today
     today_day_of_week = date.today().weekday()  # 0 - Monday, 6 - Sunday
-
+    availability = Availability.objects.filter(
+        court__in=courts,  # Filter availability for the selected courts
+        day_of_week=today_day_of_week
+    )
     return render(request, 'bookings/book_slot.html', {
         'courts': courts,
+        'availability': availability,
     })
 
 def make_booking(request, court_id):
