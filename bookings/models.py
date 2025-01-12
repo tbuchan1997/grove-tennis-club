@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
+from datetime import time, timedelta, datetime
+from django.utils import timezone
+
 
 # Create your models here.
 
@@ -12,21 +15,39 @@ class Court(models.Model):
 
 class Availability(models.Model):
     court = models.ForeignKey('Court', on_delete=models.CASCADE)
-    day_of_week = models.IntegerField(choices=[
-        (0, 'Monday'),
-        (1, 'Tuesday'),
-        (2, 'Wednesday'),
-        (3, 'Thursday'),
-        (4, 'Friday'),
-        (5, 'Saturday'),
-        (6, 'Sunday'),
-    ])
+    date = models.DateField(default=timezone.now)
     start_time = models.TimeField()
     end_time = models.TimeField()
     is_available = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"Availability for {self.court} on day {self.day_of_week}"
+        return f"Availability for {self.court} on day {self.date} from {self.start_time} to {self.end_time}"
+
+    @classmethod
+    def create_default_availability(cls):
+        courts = Court.objects.all()
+        today = timezone.localdate() # Todays date, for testing
+        start_time = time(8, 0) # Available from 8am
+        end_time = time(22, 0) # Until 10pm
+
+        for court in courts:
+            current_time = timezone.datetime.combine(today, start_time)
+
+            while current_time.time() < end_time:
+                for block in time_blocks:
+                    next_time = current_time + timedelta(minutes=60)
+                    # Create each slot with start_time, end_time, and availability
+                    cls.objects.create(
+                        court=court,
+                        date=today,
+                        start_time=current_time.time(),
+                        end_time=next_time.time(),
+                    )
+                    current_time = next_time
+
+
+
+
 
 class Booking(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
