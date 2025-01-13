@@ -1,29 +1,32 @@
-from django.test import TestCase
-
 # Create your tests here.
-# bookings/tests/test_models.py
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 from bookings.models import Availability, Court
 from datetime import datetime, time, timedelta
+from unittest import mock
 
 class AvailabilityModelTest(TestCase):
 
-    def test_default_availability(self):
+    @mock.patch('datetime.date.today', return_value=datetime(2025, 1, 13).date())  # Mocking the method
+    def test_default_availability(self, mock_today):
         court = Court.objects.create(court_number=1, court_type="Hard")
         # Create an availability instance without setting 'is_available'
         availability = Availability.objects.create(
-            court_id=1,  # Use a valid court ID
-            day_of_week=datetime.today().weekday(),  # Use the current day of the week
-            start_time="10:00",  # Example start time
-            end_time="11:00",  # Example end time
+            court_id=1,  
+            date=mock_today(),  # Use the mocked date here
+            start_time="10:00",
+            end_time="11:00",
         )
         
         # Check if 'is_available' is set to True by default
         self.assertTrue(availability.is_available)
 
-    def test_create_default_availability(self):
+    @mock.patch('datetime.date.today', return_value=datetime(2025, 1, 13).date())  # Mocking the method
+    def test_create_default_availability(self, mock_today):
+        # Mock today's date
+        today = mock_today()
+
         # Create test courts
         for i in range(1, 5):
             Court.objects.create(court_number=i, court_type="Standard")
@@ -32,7 +35,6 @@ class AvailabilityModelTest(TestCase):
         Availability.create_default_availability()
 
         # Get today's date and time slots
-        today = timezone.localdate()
         start_time = time(8, 0)
         end_time = time(22, 0)
         total_slots = 14  # 8am to 10pm in 1-hour slots
@@ -51,20 +53,40 @@ class AvailabilityModelTest(TestCase):
                 self.assertTrue(slot.is_available)
                 current_time = next_time
 
+    @mock.patch('datetime.date.today')
+    def test_default_availability(self, mock_today):
+        # Mock the 'today' method to return a specific date
+        mock_today.return_value = datetime(2025, 1, 13).date()  # Example date
+        
+        court = Court.objects.create(court_number=1, court_type="Hard")
+        # Create an availability instance without setting 'is_available'
+        availability = Availability.objects.create(
+            court_id=1,  
+            date=mock_today.return_value,  # Use the mocked date here
+            start_time="10:00",
+            end_time="11:00",
+        )
+        
+        # Check if 'is_available' is set to True by default
+        self.assertTrue(availability.is_available)
+
 
 
 class BookSlotViewTest(TestCase):
-
-    def setUp(self):
+    @mock.patch('datetime.date.today')
+    def setUp(self, mock_today):
+        # Mock today's date
+        mock_today.return_value = datetime(2025, 1, 13).date()
+        
         # Create a court for testing
         self.court = Court.objects.create(court_number=1, court_type="Indoor")
         
         # Create an availability slot for the court
         Availability.objects.create(
             court=self.court,
-            day_of_week=datetime.today().weekday(),
-            start_time="10:00",
-            end_time="11:00",
+            date=mock_today.return_value,  # Use the mocked date here
+            start_time=datetime.time(10, 0),
+            end_time=datetime.time(11, 0),
             is_available=True
         )
 
@@ -79,6 +101,7 @@ class BookSlotViewTest(TestCase):
         self.assertIn('availability', response.context)
         self.assertEqual(len(response.context['availability']), 1)  # We created one slot in setUp()
 
+    
     def test_no_duplicate_availability(self):
         # Call the method to create default availability
         Availability.create_default_availability()
