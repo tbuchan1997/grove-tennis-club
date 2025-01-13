@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from .models import Court, Booking, Availability
-from datetime import date
+from datetime import datetime, time, timedelta, date
 
 # Create your views here.
 
@@ -24,19 +24,38 @@ def signup(request):
     return render(request, 'bookings/signup.html', {'form': form})
 
 def book_slot(request):
-    courts = Court.objects.all()  # Fetch all courts
+    courts = Court.objects.all().order_by('court_number')
+    date_str = request.GET.get('date')
+    if date_str:
+        try:
+            date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
+        except ValueError:
+            date_obj = localdate()
+    else:
+        date_obj = localdate()
 
+    start_hour = 8
+    end_hour = 22
+    time_slots = [(time(h, 0), time(h + 1, 0)) for h in range(start_hour, end_hour)]
 
-    # Fetch availability slots for today
-    today_day_of_week = date.today().weekday()  # 0 - Monday, 6 - Sunday
-    availability = Availability.objects.filter(
-        court__in=courts,  # Filter availability for the selected courts
-        day_of_week=today_day_of_week
-    )
-    return render(request, 'bookings/book_slot.html', {
+    # Change availability_data to a dictionary keyed by court number
+    availability_data = {}
+    for court in courts:
+        court_availability = []
+        for start, end in time_slots:
+            availability = Availability.objects.filter(
+                court=court, date=date_obj, start_time=start
+            ).first()
+            court_availability.append({'start': start, 'availability': availability})
+        availability_data[court.court_number] = court_availability
+
+    context = {
         'courts': courts,
-        'availability': availability,
-    })
+        'time_slots': time_slots,
+        'availability_data': availability_data,  # Now a dictionary
+        'selected_date': date_obj,
+    }
+    return render(request, 'bookings/book_slot.html', context)
 
 def make_booking(request, court_id):
     court = Court.objects.get(id=court_id)

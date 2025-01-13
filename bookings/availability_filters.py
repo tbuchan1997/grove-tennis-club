@@ -2,11 +2,6 @@ from django import template
 
 register = template.Library()
 
-@register.filter(name='get_item')
-def get_item(dictionary, key):
-    return dictionary.get(key)
-
-
 @register.filter(name='dictslot')
 def dictslot(availability_list, target_start_time):
     """
@@ -26,7 +21,3 @@ def dictslot(availability_list, target_start_time):
         if item.get('start') == target_start_time:
             return item.get('availability')
     return None
-
-@register.filter(name='get_availability_for_court')
-def get_availability_for_court(availability_data, court):
-    return availability_data[court.court_number]

@@ -1,60 +1,44 @@
 {% extends 'base_generic.html' %}
 {% load availability_filters %}
 
-
 {% block content %}
-<h1>Book a Court</h1>
+<h1>Court Availability for {{ selected_date|date:"l, F j, Y" }}</h1>
 
-<h2>Debugging Info:</h2>
-<p>Courts: {{ courts }}</p>
-<p>Availability: {{ availability }}</p>
+<form method="get">
+    <label for="date">Select Date:</label>
+    <input type="date" id="date" name="date" value="{{ selected_date|date:"Y-m-d" }}">
+    <button type="submit">Go</button>
+</form>
 
-{% if courts %}
-  <ul>
-    {% for court in courts %}
-      <li>
-        <h3>Court {{ court.court_number }} ({{ court.court_type }})</h3>
-        
-        <!-- Display available slots for today -->
-        <h4>Available Slots for Today:</h4>
-        {% if availability %}
-          <ul>
-            {% for slot in availability %}
-              {% if slot.court == court %}
-              <li>
-                Day: {{ slot.get_day_of_week_display }}<br>
-                Time: {{ slot.start_time }} - {{ slot.end_time }}
-                
-                <!-- Booking form -->
-                <form method="post" action="{% url 'make_booking' court.id %}">
-                  {% csrf_token %}
-                  <input type="hidden" name="availability_id" value="{{ availability.id }}">
-                  <label for="duration">Duration (minutes):</label>
-                  <input type="number" name="duration" min="30" max="120" required>
-                  <button type="submit">Book Slot</button>
-                </form>
-              </li>
-              {% endif %}
+<table>
+    <thead>
+        <tr>
+            <th>Time Slot</th>
+            {% for court in courts %}
+                <th>Court {{ court.court_number }}</th>
             {% endfor %}
-          </ul>
-        {% else %}
-          <p>No available slots for today.</p>
-        {% endif %}
-        
-        <!-- List existing bookings for the court -->
-        <h4>Existing Bookings:</h4>
-        <ul>
-          {% for booking in bookings %}
-            {% if booking.court == court %}
-              <li>{{ booking.user.username }} - {{ booking.booking_time }} ({{ booking.duration }} mins)</li>
-            {% endif %}
-          {% endfor %}
-        </ul>
-      </li>
-    {% endfor %}
-  </ul>
-{% else %}
-  <p>No courts available for booking.</p>
-{% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for slot in time_slots %}
+        <tr>
+            <td>{{ slot.0|time:"H:i" }} - {{ slot.1|time:"H:i" }}</td>
+            {% for court in courts %}
+                {% with court_availability_list=availability_data|get_availability_for_court:court %}
+                    {% with availability=court_availability_list|dictslot:slot.0 %}
+                        <td {% if availability and availability.is_available %} class="available"
+                            {% elif availability %} class="booked"
+                            {% else %} class="unavailable" {% endif %}>
+                            {% if availability and availability.is_available %}
+                                <a href="{% url 'make_booking' court.id %}?booking_time={{ slot.0|time:"H:i" }}&duration=1">Book</a>
+                            {% endif %}
+                        </td>
+                    {% endwith %}
+                {% endwith %}
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
 {% endblock %}
