@@ -34,7 +34,6 @@ class Availability(models.Model):
             current_time = timezone.datetime.combine(today, start_time)
 
             while current_time.time() < end_time:
-                for block in time_blocks:
                     next_time = current_time + timedelta(minutes=60)
                     # Create each slot with start_time, end_time, and availability
                     cls.objects.create(
