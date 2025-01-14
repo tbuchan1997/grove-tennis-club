@@ -78,6 +78,8 @@ TEMPLATES = [
     },
 ]
 
+LOGIN_REDIRECT_URL = 'book_slot'
+LOGOUT_REDIRECT_URL = 'home'
 WSGI_APPLICATION = 'grove_tennis_club.wsgi.application'
 
 

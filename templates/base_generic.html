@@ -3,22 +3,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Tennis Club{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <title>{% block title %}Grove Tennis Club{% endblock %}</title>
 </head>
 <body>
-    <header>
-        <nav>
-            <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href="{% url 'book_slot' %}">Book a Court</a></li>
-            </ul>
-        </nav>
-    </header>
+    <nav>
+        <ul>
+            <li><a href="{% url 'book_slot' %}">Book a Slot</a></li>
+            {% if user.is_authenticated %}
+                <li>Hello, {{ user.username }}!</li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+            {% else %}
+                <li><a href="{% url 'login' %}">Login</a></li>
+                <li><a href="{% url 'register' %}">Register</a></li>
+            {% endif %}
+        </ul>
+    </nav>
 
-    {% block content %}{% endblock %}
+    <div class="content">
+        {% block content %}
+        {% endblock %}
+    </div>
 
     <footer>
         <p>&copy; 2025 Tennis Club</p>

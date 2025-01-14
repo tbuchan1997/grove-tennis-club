@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect
 from django.views.generic import TemplateView
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from django.utils import timezone
 from django.http import HttpResponseRedirect
@@ -8,32 +7,24 @@ from django.urls import reverse
 from .models import Court, Booking, Availability
 from datetime import datetime, time, timedelta, date
 import json  # Import json for pretty printing
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
 class HomePage(TemplateView):
     template_name = 'index.html'
 
-def signup(request):
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect(reverse('login'))
-    else:
-        form = UserCreationForm()
-    return render(request, 'bookings/signup.html', {'form': form})
-
+@login_required
 def book_slot(request):
     courts = Court.objects.all().order_by('court_number')
+    date_obj = timezone.localdate()
     date_str = request.GET.get('date')
     if date_str:
         try:
             date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
         except ValueError:
-            date_obj = localdate()
-    else:
-        date_obj = localdate()
+            messages.error(request, "Invalid date format. Please use YYYY-MM-DD.")
+            return redirect('book_slot')
 
     today = timezone.localdate()
     for day_offset in range(7):  # Create availability for the next 7 days
