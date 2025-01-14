@@ -25,15 +25,19 @@
             <td>{{ slot.0|time:"H:i" }} - {{ slot.1|time:"H:i" }}</td>
             {% for court in courts %}
                 {% with court_availability_list=availability_data|get_availability_for_court:court %}
-                    {% with availability=court_availability_list|dictslot:slot.0 %}
-                        <td {% if availability and availability.is_available %} class="available"
-                            {% elif availability %} class="booked"
-                            {% else %} class="unavailable" {% endif %}>
-                            {% if availability and availability.is_available %}
-                                <a href="{% url 'make_booking' court.id %}?booking_time={{ slot.0|time:"H:i" }}&duration=1">Book</a>
-                            {% endif %}
-                        </td>
-                    {% endwith %}
+                    {% if court_availability_list %} {# Check if court_availability_list is not None #}
+                        {% with availability=court_availability_list|dictslot:slot.0 %}
+                            <td {% if availability and availability.is_available %} class="available"
+                                {% elif availability %} class="booked"
+                                {% else %} class="unavailable" {% endif %}>
+                                {% if availability and availability.is_available %}
+                                    <a href="{% url 'make_booking' court.id %}?booking_time={{ slot.0|time:"H:i" }}&duration=1">Book</a>
+                                {% endif %}
+                            </td>
+                        {% endwith %}
+                    {% else %}
+                        <td></td> {# Empty cell if no availability for the court #}
+                    {% endif %}
                 {% endwith %}
             {% endfor %}
         </tr>

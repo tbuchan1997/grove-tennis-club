@@ -7,6 +7,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from .models import Court, Booking, Availability
 from datetime import datetime, time, timedelta, date
+import json  # Import json for pretty printing
 
 # Create your views here.
 
@@ -34,20 +35,42 @@ def book_slot(request):
     else:
         date_obj = localdate()
 
+    today = timezone.localdate()
+    for day_offset in range(7):  # Create availability for the next 7 days
+        target_date = today + timedelta(days=day_offset)
+        for court in courts:
+            if not Availability.objects.filter(court=court, date=target_date).exists():
+                start_hour = 8
+                end_hour = 22
+                for hour in range(start_hour, end_hour):
+                    Availability.objects.create(
+                        court=court,
+                        date=target_date,
+                        start_time=time(hour, 0),
+                        end_time=time(hour + 1, 0),
+                        is_available=True,
+                    )
+
     start_hour = 8
     end_hour = 22
     time_slots = [(time(h, 0), time(h + 1, 0)) for h in range(start_hour, end_hour)]
 
-    # Change availability_data to a dictionary keyed by court number
-    availability_data = {}
+    availability_data = []
     for court in courts:
         court_availability = []
         for start, end in time_slots:
-            availability = Availability.objects.filter(
-                court=court, date=date_obj, start_time=start
-            ).first()
-            court_availability.append({'start': start, 'availability': availability})
-        availability_data[court.court_number] = court_availability
+            try:
+                availability = Availability.objects.get(  # Use .get() here
+                    court=court, date=date_obj, start_time=start
+                )
+                if availability.is_within_booking_window():
+                    court_availability.append({'start': start, 'availability': availability})
+                else:
+                    court_availability.append({'start': start, 'availability': None})
+            except Availability.DoesNotExist:  # Handle the case where no Availability exists
+                court_availability.append({'start': start, 'availability': None})
+
+        availability_data.append({'court': court, 'availability': court_availability})
 
     context = {
         'courts': courts,
@@ -55,6 +78,7 @@ def book_slot(request):
         'availability_data': availability_data,  # Now a dictionary
         'selected_date': date_obj,
     }
+    print(json.dumps(availability_data, indent=4, default=str))  # Print with indentation
     return render(request, 'bookings/book_slot.html', context)
 
 def make_booking(request, court_id):

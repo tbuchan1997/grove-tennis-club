@@ -24,25 +24,28 @@ class Availability(models.Model):
         return f"Availability for {self.court} on day {self.date} from {self.start_time} to {self.end_time}"
 
     @classmethod
-    def create_default_availability(cls):
+    def create_default_availability(cls, days=7, start_time=time(8, 0), end_time=time(22, 0)):
+        """Creates default availability for the next 'days' days."""
         courts = Court.objects.all()
-        today = timezone.localdate() # Todays date, for testing
-        start_time = time(8, 0) # Available from 8am
-        end_time = time(22, 0) # Until 10pm
-
-        for court in courts:
-            current_time = timezone.datetime.combine(today, start_time)
-
-            while current_time.time() < end_time:
-                    next_time = current_time + timedelta(minutes=60)
-                    # Create each slot with start_time, end_time, and availability
+        for day_offset in range(days):
+            target_date = timezone.localdate() + timedelta(days=day_offset)
+            for court in courts:
+                for current_hour in range(start_time.hour, end_time.hour):
+                    next_hour = (current_hour + 1) % 24
                     cls.objects.create(
                         court=court,
-                        date=today,
-                        start_time=current_time.time(),
-                        end_time=next_time.time(),
+                        date=target_date,
+                        start_time=time(current_hour, 0),
+                        end_time=time(next_hour, 0),
+                        is_available=True,
                     )
-                    current_time = next_time
+
+    def is_within_booking_window(self, days=7):
+        """Checks if the availability date is within the next 'days' days."""
+        return self.date <= timezone.localdate() + timedelta(days=days)
+
+    def __str__(self):
+        return f"Availability for {self.court} on {self.date} from {self.start_time} to {self.end_time}"
 
 
 
