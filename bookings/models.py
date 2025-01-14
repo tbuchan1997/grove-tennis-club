@@ -52,11 +52,13 @@ class Availability(models.Model):
 
 
 class Booking(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    court = models.ForeignKey(Court, on_delete=models.CASCADE)
-    booking_time = models.DateTimeField()
-    duration = models.IntegerField()  # In minutes
+    booked_by = models.ForeignKey(User, on_delete=models.CASCADE)  # Changed to booked_by for clarity
+    court = models.ForeignKey(Court, on_delete=models.CASCADE) #You can remove this if you want
+    availability = models.ForeignKey(Availability, on_delete=models.CASCADE)  # Add this line
+    booking_date = models.DateField() #Add this line
+    booking_time = models.TimeField()
+    duration = models.IntegerField()
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"Booking for {self.user} on {self.court} at {self.booking_time}"
+        return f"Booking for {self.court} on {self.booking_date} at {self.booking_time} by {self.booked_by}"
