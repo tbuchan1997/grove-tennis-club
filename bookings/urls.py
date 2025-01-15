@@ -6,5 +6,6 @@ from . import views
 urlpatterns = [
     path('', views.HomePage.as_view(), name='home'),
     path('book_slot/', views.book_slot, name='book_slot'),
-    path('make_booking/<int:court_id>/', views.make_booking, name='make_booking'),
+    path('booking_form/<int:availability_id>/', views.show_booking_form, name='booking_form'),
+    path('make_booking/', views.make_booking, name='make_booking'),
 ]

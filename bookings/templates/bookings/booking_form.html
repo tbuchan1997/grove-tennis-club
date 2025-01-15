@@ -1,0 +1,17 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h1>Booking Form</h1>
+
+    <p>Court: {{ court.id }}</p>
+    <p>Time: {{ booking_time }}</p>
+
+    <form method="post" action="{% url 'make_booking' %}">
+        {% csrf_token %}
+        <input type="hidden" name="availability" value="{{ availability.id }}">
+        <input type="hidden" name="duration" value="1">
+        <button type="submit">Confirm Booking</button>
+    </form>
+
+    <a href="{% url 'book_slot' %}">Back to Availability</a>
+{% endblock %}
