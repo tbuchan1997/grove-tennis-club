@@ -52,7 +52,8 @@ class Availability(models.Model):
 
 
 class Booking(models.Model):
-    booked_by = models.ForeignKey(User, on_delete=models.CASCADE)  # Changed to booked_by for clarity
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='my_bookings')
+    booked_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='assigned_bookings')  # Changed to booked_by for clarity
     court = models.ForeignKey(Court, on_delete=models.CASCADE) #You can remove this if you want
     availability = models.ForeignKey(Availability, on_delete=models.CASCADE)  # Add this line
     booking_date = models.DateField() #Add this line

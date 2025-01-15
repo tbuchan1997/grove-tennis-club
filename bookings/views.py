@@ -95,7 +95,8 @@ def make_booking(request):
                 booking_date=availability.date,
                 booking_time=availability.start_time,
                 duration=duration,
-                is_active=True
+                is_active=True,
+                booked_by=request.user
             )
 
             messages.success(request, f"Booking confirmed for Court {court.court_number} at {booking_time}.")
