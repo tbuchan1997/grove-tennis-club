@@ -2,12 +2,16 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import TemplateView
 from django.contrib import messages
 from django.utils import timezone
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from .models import Court, Booking, Availability
 from datetime import datetime, time, timedelta, date
 import json  # Import json for pretty printing
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
+from django.core.exceptions import ValidationError
+import datetime
+from dateutil.parser import parse
 
 # Create your views here.
 
@@ -19,12 +23,24 @@ def book_slot(request):
     courts = Court.objects.all().order_by('court_number')
     date_obj = timezone.localdate()
     date_str = request.GET.get('date')
+    reschedule_id = request.GET.get('reschedule_id')
+
     if date_str:
         try:
-            date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
-        except ValueError:
-            messages.error(request, "Invalid date format. Please use YYYY-MM-DD.")
+            date_obj = parse(date_str).date()
+        except (ValueError, TypeError):  # Handle both ValueError and TypeError
+            messages.error(request, "Invalid date format.")
             return redirect('book_slot')
+
+    if reschedule_id:
+        try:
+            booking_to_cancel = Booking.objects.get(pk=reschedule_id, user=request.user)
+            booking_to_cancel.is_active = False
+            booking_to_cancel.save()
+            messages.success(request, "Your previous booking has been cancelled.")
+        except Booking.DoesNotExist:
+            messages.error(request, "Booking not found.")
+            return redirect('dashboard') # Redirect to dashboard if booking not found
 
     today = timezone.localdate()
     for day_offset in range(7):  # Create availability for the next 7 days
@@ -69,7 +85,7 @@ def book_slot(request):
         'availability_data': availability_data,  # Now a dictionary
         'selected_date': date_obj,
     }
-    print(json.dumps(availability_data, indent=4, default=str))  # Print with indentation
+    print(f"Availability Data (book_slots): {availability_data}")  # Print with indentation
     return render(request, 'bookings/book_slot.html', context)
 
 def make_booking(request):
@@ -99,8 +115,9 @@ def make_booking(request):
                 booked_by=request.user
             )
 
-            messages.success(request, f"Booking confirmed for Court {court.court_number} at {booking_time}.")
-            return redirect('book_slot')
+            availability.is_available = False
+            availability.save()
+            return render(request, 'bookings/booking_success.html', {'booking': booking})  # Redirect to success page
 
         except Availability.DoesNotExist:
             messages.error(request, 'Selected availability not found.')
@@ -116,3 +133,129 @@ def show_booking_form(request, availability_id):
         'court': court,
         'booking_time': booking_time,
     })
+
+def booking_success(request):
+    return render(request, 'bookings/booking_success.html')
+
+@login_required
+def view_bookings(request):
+    bookings = Booking.objects.filter(user=request.user, is_active=True).order_by('booking_date', 'booking_time') #Only active bookings
+    return render(request, 'bookings/dashboard.html', {'bookings': bookings})
+
+@login_required
+def cancel_booking(request, booking_id):
+    booking = get_object_or_404(Booking, pk=booking_id, user=request.user, is_active=True)
+    if request.method == 'POST':
+        availability = booking.availability
+        booking.is_active = False
+        booking.save()
+        availability.is_available = True
+        availability.save()
+        messages.success(request, "Booking cancelled successfully.")
+        return redirect('view_bookings')  # Redirect to dashboard
+    return render(request, 'bookings/cancel_booking.html', {'booking': booking}) #Render cancel page if not a post request
+
+@login_required
+def reschedule_booking(request):
+    print("Reschedule view was called!")
+    if request.method == 'POST':
+        booking_id = request.POST.get('booking_id')
+        print(f"Booking ID from post: {booking_id}")
+        if not booking_id:
+            messages.error(request, "Booking ID is missing. Please try again.")
+            return redirect('view_bookings')
+
+        try:
+            with transaction.atomic():
+                booking = get_object_or_404(Booking, pk=booking_id, user=request.user, is_active=True)
+                print(f"Original booking: {booking}")
+                old_availability = booking.availability
+                print(f"Old Availability: {old_availability} (is_available: {old_availability.is_available})")
+
+                new_date_str = request.POST.get('new_date')
+                new_time_str = request.POST.get('new_time')
+
+                try:
+                    new_date = datetime.datetime.strptime(new_date_str, '%Y-%m-%d').date()
+                    new_time = datetime.datetime.strptime(new_time_str, '%H:%M').time()
+                    print(f"New Date: {new_date}")
+                    print(f"New Time: {new_time}")
+                except ValueError as e:
+                    print(f"Datetime parsing error: {e}") # Print the specific error
+                    messages.error(request, "Invalid date or time format. Please use YYYY-MM-DD and HH:MM.")
+                    return redirect('view_bookings')
+
+                old_availability.is_available = True
+                old_availability.save()
+                print(f"Old Availability AFTER SAVE: {old_availability} (is_available: {old_availability.is_available})")
+
+                try:
+                    new_availability = Availability.objects.get(court=booking.court, date=new_date, start_time=new_time, is_available=True)
+                    print(f"New Availability: {new_availability} (is_available: {new_availability.is_available})")
+                except Availability.DoesNotExist:
+                    old_availability.is_available = False
+                    old_availability.save()
+                    print("New Availability DOES NOT EXIST")
+                    messages.error(request, "Selected availability not found.")
+                    return redirect('view_bookings')
+
+                if Booking.objects.filter(court=booking.court, booking_time=new_time, booking_date=new_date, is_active=True).exclude(pk=booking.pk).exists():
+                    old_availability.is_available = False
+                    old_availability.save()
+                    print("New Availability is booked")
+                    messages.error(request, "This slot is already booked.")
+                    return redirect('view_bookings')
+
+                booking.booking_date = new_date
+                booking.booking_time = new_time
+                booking.availability = new_availability
+                booking.save()
+                print(f"Booking AFTER SAVE: {booking}")
+
+                new_availability.is_available = False
+                new_availability.save()
+                print(f"New Availability AFTER SAVE: {new_availability} (is_available: {new_availability.is_available})")
+
+                messages.success(request, "Booking rescheduled successfully.")
+                return redirect('view_bookings')
+
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+            messages.error(request, f"An unexpected error occurred: {e}")
+            return redirect('view_bookings')
+    print(f"Availability Data (dashboard): {availability_data}")
+    return redirect('view_bookings')
+
+@login_required
+def dashboard(request):
+    bookings = Booking.objects.filter(user=request.user, booking_date__gte=timezone.now()).order_by('booking_date', 'booking_time')
+    courts = Court.objects.all().order_by('court_number')
+    today = timezone.localdate()
+    start_hour = 8
+    end_hour = 22
+    time_slots = [(time(h, 0), time(h + 1, 0)) for h in range(start_hour, end_hour)]
+
+    availability_data = {}
+    for court in courts:
+        for availability in Availability.objects.filter(court=court, date__gte=today):
+            if availability.date == today and availability.start_time <= timezone.now().time():
+                continue
+            if availability.date not in availability_data:
+                availability_data[availability.date] = {}
+            if availability.start_time not in availability_data[availability.date]:
+                availability_data[availability.date][availability.start_time] = {}
+            availability_data[availability.date][availability.start_time][court.id] = availability
+
+
+    context = {
+        'bookings': bookings,  # Existing bookings data, if any
+        'courts': courts,
+        'time_slots': time_slots,
+        'availability_data': availability_data,  # Availability data pre-calculated
+        'selected_date': selected_date,  # Date to display
+    }
+
+    print("Time Slots:", time_slots)
+    print("Courts:", courts)
+    return render(request, 'bookings/dashboard.html', context)
+

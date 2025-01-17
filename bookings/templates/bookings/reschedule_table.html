@@ -1,0 +1,51 @@
+{% load static %}
+{% load availability_filters %}
+
+{% block content %}
+<h1>Court Availability for {{ selected_date|date:"l, F j, Y" }}</h1>
+
+<form method="get">
+    <label for="date">Select Date:</label>
+    <input type="date" id="date" name="date" value="{{ selected_date|date:"Y-m-d" }}">
+    <button type="submit">Go</button>
+</form>
+
+<table>
+    <thead>
+        <tr>
+            <th>Time Slot</th>
+            {% for court in courts %}
+            <th>Court {{ court.court_number }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for slot in time_slots %}
+        <tr>
+            <td>{{ slot.0|time:"H:i" }} - {{ slot.1|time:"H:i" }}</td>
+            {% for court in courts %}
+            {% with court_availability_list=availability_data|get_availability_for_court:court %}
+            {% if court_availability_list %} {# Check if court_availability_list is not None #}
+            {% with availability=court_availability_list|dictslot:slot.0 %}
+            <td {% if availability and availability.is_available %} class="available" {% elif availability %}
+                class="booked" {% else %} class="unavailable" {% endif %}>
+                {% if availability and availability.is_available %}
+                <a href="{% url 'booking_form' availability.id %}">Book</a>
+                {% endif %}
+            </td>
+            {% endwith %}
+            {% else %}
+            <td></td> {# Empty cell if no availability for the court #}
+            {% endif %}
+            {% endwith %}
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+<link rel="stylesheet" href="{% static 'css/modal.css' %}">
+<script src="{% static 'js/script.js' %}"></script>
+
+{% endblock %}

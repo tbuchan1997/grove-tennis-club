@@ -1,0 +1,7 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h1>Booking Confirmed!</h1>
+    <p>Your booking for {{ booking.court.name }} on {{ booking.booking_date }} at {{ booking.booking_time }} has been successfully processed.</p>
+    <a href="{% url 'book_slot' %}">Back to Booking Page</a>
+{% endblock %}
