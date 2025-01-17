@@ -30,7 +30,14 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['8000-tbuchan1997-grovetennis-7ysp2ip18cb.ws.codeinstitute-ide.net']
+ALLOWED_HOSTS = [
+    '8000-tbuchan1997-grovetennis-7ysp2ip18cb.ws.codeinstitute-ide.net',
+     os.environ.get("RENDER_EXTERNAL_HOSTNAME"),
+     ]
+
+if os.environ.get("RENDER_EXTERNAL_HOSTNAME"):
+    ALLOWED_HOSTS.append(os.environ.get("RENDER_EXTERNAL_HOSTNAME"))
+    
 CSRF_TRUSTED_ORIGINS = ['https://*.codeinstitute-ide.net', 'https://*.herokuapp.com']
 
 
