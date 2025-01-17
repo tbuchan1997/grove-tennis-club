@@ -42,6 +42,8 @@ def book_slot(request):
             messages.error(request, "Booking not found.")
             return redirect('dashboard') # Redirect to dashboard if booking not found
 
+    now = timezone.now()
+
     today = timezone.localdate()
     for day_offset in range(7):  # Create availability for the next 7 days
         target_date = today + timedelta(days=day_offset)
@@ -78,6 +80,12 @@ def book_slot(request):
                 court_availability.append({'start': start, 'availability': None})
 
         availability_data.append({'court': court, 'availability': court_availability})
+
+    for court in courts:
+        for availability in Availability.objects.filter(court=court, date=date_obj):
+            if availability.date == now.date() and availability.start_time <= now.time():
+                availability.is_available = False
+                availability.save()
 
     context = {
         'courts': courts,
@@ -234,6 +242,14 @@ def dashboard(request):
     start_hour = 8
     end_hour = 22
     time_slots = [(time(h, 0), time(h + 1, 0)) for h in range(start_hour, end_hour)]
+
+    now = timezone.now()  # Get the current time in the appropriate timezone
+    bookings = Booking.objects.filter(
+        user=request.user,
+        booking_date__gte=now.date()  # Only bookings on or after today
+    ).exclude(
+        booking_date=now.date(), booking_time__lt=now.time()  # Exclude past bookings for today
+    ).order_by('booking_date', 'booking_time')
 
     availability_data = {}
     for court in courts:
