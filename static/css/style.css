@@ -198,3 +198,10 @@ table.table tr td.available a:hover {
 table.table tr td:empty{
     background-color: #eee;
 }
+
+
+/* Success Page Styles */
+
+.text-center {
+    text-align: center; /* Center the content within the card body */
+}

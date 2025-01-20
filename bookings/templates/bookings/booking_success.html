@@ -1,7 +1,23 @@
 {% extends "base_generic.html" %}
+{% load static %}
 
 {% block content %}
-    <h1>Booking Confirmed!</h1>
-    <p>Your booking for {{ booking.court.name }} on {{ booking.booking_date }} at {{ booking.booking_time }} has been successfully processed.</p>
-    <a href="{% url 'book_slot' %}">Back to Booking Page</a>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">  {# Adjust column width as needed #}
+            <div class="card">
+                <div class="card-header">
+                    <h2>Booking Confirmed</h2>
+                </div>
+                <div class="card-body text-center">
+                    <p>
+                        <i class="fas fa-check-circle fa-3x text-success"></i>  {# Success icon #}
+                    </p>
+                    <p>Your booking for {{ booking.court.name }} on {{ booking.booking_date }} at {{ booking.booking_time }} has been successfully processed.</p>
+                    <a href="{% url 'book_slot' %}" class="btn btn-primary">Back to Booking Page</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

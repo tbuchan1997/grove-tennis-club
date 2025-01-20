@@ -1,17 +1,29 @@
 {% extends "base_generic.html" %}
+{% load static %}
 
 {% block content %}
-    <h1>Booking Form</h1>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">  {# Adjust column width as needed #}
+            <div class="card">
+                <div class="card-header">
+                    <h2>Booking Confirmation</h2>
+                </div>
+                <div class="card-body">
+                    <p>Court: {{ court.id }}</p>
+                    <p>Time: {{ booking_time }}</p>
 
-    <p>Court: {{ court.id }}</p>
-    <p>Time: {{ booking_time }}</p>
+                    <form method="post" action="{% url 'make_booking' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="availability" value="{{ availability.id }}">
+                        <input type="hidden" name="duration" value="1">
+                        <button type="submit" class="btn btn-primary">Confirm Booking</button>
+                    </form>
 
-    <form method="post" action="{% url 'make_booking' %}">
-        {% csrf_token %}
-        <input type="hidden" name="availability" value="{{ availability.id }}">
-        <input type="hidden" name="duration" value="1">
-        <button type="submit">Confirm Booking</button>
-    </form>
-
-    <a href="{% url 'book_slot' %}">Back to Availability</a>
+                    <a href="{% url 'book_slot' %}" class="btn btn-secondary mt-2">Back to Availability</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
