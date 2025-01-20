@@ -147,3 +147,9 @@ body {
     padding: 20px;
     border-radius: 10px;
 }
+
+/* Registration Form Styles */
+
+.invalid-feedback {
+    display: block; /* Make sure error messages are visible */
+}
