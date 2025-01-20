@@ -2,31 +2,99 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <title>{% block title %}Grove Tennis Club{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="https://kit.fontawesome.com/34a949671a.js" crossorigin="anonymous"></script>
+    <title>{% block title %}{% endblock %}</title>
 </head>
+
 <body>
-    <nav>
-        <ul>
-            <li><a href="{% url 'book_slot' %}">Book a Slot</a></li>
-            {% if user.is_authenticated %}
-                <li>Hello, {{ user.username }}!</li>
-                <li><a href="{% url 'view_bookings' %}">My Bookings</a></li> {# Added "My Bookings" link #}
-                <li><a href="{% url 'logout' %}">Logout</a></li>
-            {% else %}
-                <li><a href="{% url 'login' %}">Login</a></li>
-                <li><a href="{% url 'register' %}">Register</a></li>
-            {% endif %}
-        </ul>
-    </nav>
+    <header id="page-header">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto"> {# ms-auto for right alignment #}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'home' %}">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'book_slot' %}">Book a Slot</a>
+                        </li>
+                        {% if user.is_authenticated %}
+                            <li class="nav-item">Hello, {{ user.username }}!</li>
+                            <li class="nav-item"> <a class="nav-link" href="{% url 'view_bookings' %}">My Bookings</a></li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'login' %}">Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'register' %}">Register</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
 
-    <div class="content">
-        {% block content %}
-        {% endblock %}
-    </div>
+    <main id="page-content">
+        {% block content %}{% endblock %}
+    </main>
 
-    <footer>
-        <p>&copy; 2025 Tennis Club</p>
+    <footer id="page-footer" class="bg-light text-center py-3 mt-auto">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5>Contact Us</h5>
+                    <p>10 Downing Street<br>
+                       Westminster, London SW1A 2AA<br>
+                       Phone: 020 7930 1234</p>
+                </div>
+                <div class="col-md-4">
+                    <p>&copy; 2025 Grove Tennis Club</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Follow Us</h5>
+                    <ul class="list-inline">
+                        <li class="list-inline-item">
+                            <a href="#" class="text-decoration-none text-dark" aria-label="Facebook">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-facebook" viewBox="0 0 16 16">
+                                    <path d="M16 8.049c0-4.436-3.582-8.05-8-8.05C3.58 0-.002 3.613-.002 8.049c0 4.435 3.582 8.05 8 8.05c4.418 0 7.998-3.615 7.998-8.05zM3.885 4.857v.085h.622c.548 0 .932.166 1.054.476l.005.013c1.049 2.689 1.912 5.37 2.775 8.052h.651c-.664-2.687-1.442-5.372-2.108-8.052h-.622zm10.74 0c-.664 2.68-1.442 5.365-2.107 8.048h-.651c.863-2.678 1.726-5.358 2.39-8.048h.622v-.085z"/>
+                                </svg>
+                            </a>
+                        </li>
+                        <li class="list-inline-item">
+                            <a href="#" class="text-decoration-none text-dark" aria-label="Twitter">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-twitter-x" viewBox="0 0 16 16">
+                                    <path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.932l-3.867-4.382L4.94 15.25H.48v-2.108l4.777-5.392L.479 3.14h4.495l3.867 4.382L15.52 0h-2.92zM6.252 8.338l-2.29-2.62L12.485.75h1.516z"/>
+                                </svg>
+                            </a>
+                        </li>
+                        <li class="list-inline-item">
+                            <a href="#" class="text-decoration-none text-dark" aria-label="Instagram">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-instagram" viewBox="0 0 16 16">
+                                    <path d="M8 0C5.829 0 5.556.01 4.279.034c-1.945.217-3.631 1.138-4.94 2.602-1.26 1.44-1.87 3.31-1.87 5.176 0 1.865.61 3.735 1.87 5.175 1.309 1.464 2.995 2.385 4.94 2.602 1.278.145 2.557.23 4.279.23s3.001-.085 4.279-.23c1.945-.217 3.631-1.138 4.94-2.602 1.26-1.44 1.87-3.31 1.87-5.175 0-1.865-.61-3.735-1.87-5.175C12.995 1.18 11.31 0 8 0zm.5 6.5c0 1.654-1.346 3-3 3s-3-1.346-3-3 1.346-3 3-3 3 1.346 3 3z"/>
+                                    <path d="M15 13a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-7-11a1 1 0 1 1 2 0 1 1 0 0 1-2 0z"/>
+                                </svg>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous">
+    </script>
 </body>
+
 </html>

@@ -1,3 +1,143 @@
-h1 {
-    color: red;
+:root {
+    --primary-bg: #E6F7F1; /* Mint Green */
+    --secondary-bg: #B2C2E0; /* Soft Sky Blue */
+    --primary-accent: #3A6F74; /* Teal Green */
+    --secondary-accent: #5C88C8; /* Deep Sky Blue */
+    --light-text: #FFFFFF; /* White */
+    --dark-text: #2D2D2D; /* Charcoal Black */
+    --test-color: red;
+}
+
+/* Booking Form Modal */
+
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Could be more or less, depending on screen size */
+    max-width: 500px;
+}
+
+.close-button {
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-button:hover,
+.close-button:focus {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Base Generic Styles */
+
+/* Basic Reset */
+:root {
+    --primary-bg: #E6F7F1; /* Mint Green */
+    --secondary-bg: #B2C2E0; /* Soft Sky Blue */
+    --primary-accent: #3A6F74; /* Teal Green */
+    --secondary-accent: #5C88C8; /* Deep Sky Blue */
+    --light-text: #FFFFFF; /* White */
+    --dark-text: #2D2D2D; /* Charcoal Black */
+}
+
+body {
+    background-color: var(--primary-bg);
+    color: var(--dark-text);
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    min-height: 100vh;
+}
+
+/* Navbar */
+.navbar {
+    background-color: var(--secondary-bg);
+}
+
+.navbar-light .navbar-brand {
+    color: var(--dark-text);
+}
+
+.navbar-light .navbar-nav .nav-link {
+    color: var(--dark-text);
+}
+
+.navbar-light .navbar-nav .nav-link:hover,
+.navbar-light .navbar-nav .nav-link:focus {
+    color: var(--primary-accent); /* Hover/focus color */
+}
+
+.navbar-light .navbar-toggler {
+    border-color: transparent;
+}
+
+.navbar-toggler-icon{
+    background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3e%3cpath stroke='rgba(45, 45, 45, 0.5)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: var(--primary-accent);
+    border-color: var(--primary-accent);
+    color: var(--light-text);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: #2b5054; /* Darker shade of primary accent on hover */
+    border-color: #2b5054;
+    color: var(--light-text);
+}
+
+.btn-secondary {
+    background-color: var(--secondary-accent);
+    border-color: var(--secondary-accent);
+    color: var(--light-text);
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus {
+    background-color: #44679d; /* Darker shade of secondary accent on hover */
+    border-color: #44679d;
+    color: var(--light-text);
+}
+
+/* Footer */
+#page-footer {
+    background-color: var(--primary-accent) !important;
+    color: var(--light-text);
+    padding: 1rem;
+    margin-top: auto; /* Push footer to bottom */
+    width: 100%;
+}
+
+#page-footer a {
+    color: var(--light-text);
+}
+
+#page-footer h5 {
+    color: var(--light-text);
+}
+
+/* Page Content */
+#page-content {
+    padding: 20px;
+    min-height: calc(100vh - 120px); /* Adjust 120px if your header/footer height changes */
+    margin-bottom: 60px;
 }
