@@ -153,3 +153,48 @@ body {
 .invalid-feedback {
     display: block; /* Make sure error messages are visible */
 }
+
+/* Book Slot Table Styles */
+
+.table {
+    width: 100%; /* Make the table responsive */
+  }
+  
+  table.table tr td.available { /* Targets table cells with class "available" inside a table with class "table" */
+    background-color: #00ff00;
+    color: #3c763d;
+}
+
+table.table tr td.booked {
+    background-color: #ffc107;
+    color: #777;
+}
+
+table.table tr td.unavailable {
+    background-color: #eee;
+    color: #777;
+}
+
+/* Style for the "Book" links */
+table.table tr td.available {
+    text-align: center; /* Center the content within the cell */
+}
+
+table.table tr td.available a {
+    display: inline-block;
+    padding: 6px 12px;
+    background-color: var(--primary-accent);
+    color: var(--light-text);
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+table.table tr td.available a:hover {
+    background-color: #2b5054;
+}
+
+/* Style for empty cells */
+table.table tr td:empty{
+    background-color: #eee;
+}
