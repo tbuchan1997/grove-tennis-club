@@ -140,3 +140,10 @@ body {
     min-height: calc(100vh - 120px); /* Adjust 120px if your header/footer height changes */
     margin-bottom: 60px;
 }
+
+/* Hero Image Text Overlay */
+.position-absolute {
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+    padding: 20px;
+    border-radius: 10px;
+}

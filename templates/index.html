@@ -1,28 +1,29 @@
 {% extends "base_generic.html" %}
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to Grove Tennis Club</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}" >
-    <script src="https://kit.fontawesome.com/34a949671a.js" crossorigin="anonymous"></script>
-   
-</head>
-<body>
-    <header>
-        <h1>Grove Tennis Club</h1>
-    </header>
+{% block title %}Welcome to Grove Tennis Club{% endblock %}
 
-    <main>
-        <p>Welcome to the Tennis Club Booking System!</p>
-        <a href="{% url 'login' %}">Login</a>
-        <a href="{% url 'register' %}">Sign Up</a>
-    </main>
+{% block content %}
+
+
+<div class="container-fluid p-0"> {# Container for full-width image #}
+    <div class="position-relative"> {# Needed for text overlay #}
+        <img src="{% static 'images/grove_tc_hero_image.webp' %}" class="img-fluid w-100"
+            alt="Grove Tennis Club Hero Image" style="max-height: 500px; object-fit: cover;"> {# Hero Image #}
+        <div class="position-absolute top-50 start-50 translate-middle text-center text-white"> {# Text Overlay #}
+            <h1>Grove Tennis Club</h1>
+            <p class="lead">Join the vibrant tennis community at Grove Tennis Club in Sheffield! We're more than just a
+                tennis club; we're a place where players of all ages and abilities come together to enjoy the sport,
+                make friends, and improve their game. Explore our booking system and become part of the Grove Tennis
+                family.</p>
+            <a href="{% url 'login' %}" class="btn btn-primary me-2">Login</a>
+            <a href="{% url 'register' %}" class="btn btn-secondary">Sign Up</a>
+        </div>
+    </div>
+</div>
+
+<main>
     
-</body>
-</html>
+</main>
+
+{% endblock %}
