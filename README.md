@@ -319,7 +319,13 @@ Overall, the design was intended and created to be clean, clear and professional
 
 
 ## Future Features  
-- 
+
+- The ability to share bookings with another party
+- Email confirmation of bookings
+- Payment portal to be able to charge for courts
+- Change membership functionality to allow anyone to book a court but give priority to a member (e.g members can book 10 days in advance rather than 7, and members get a 10% discount)
+- Add a calendar to see upcoming events at the club
+- Add a blog/news section to describe events which have happened at the club
   
 ## Technologies Used    
 
@@ -329,6 +335,7 @@ Overall, the design was intended and created to be clean, clear and professional
 - CSS3
 - Javascript
 - Python3
+- Django5
 
 ### **Frameworks, Libraries, Technologies & Programs Used**  
 
@@ -337,7 +344,7 @@ Overall, the design was intended and created to be clean, clear and professional
 - Git - used for version control
 - Google Fonts - fonts were imported from here 
 - FontAwesome - icons and their associated kit were downloaded from here
-- ChatGPT - For user story refinement, debugging and guidance on the ideation of the project
+- ChatGPT/Gemini - For user story refinement, debugging and guidance on the ideation of the project
 - Google Dev Tools - to debug and for testing responsiveness 
 - Google Lighthouse - for auditing the website
 - W3C Validator - for validating the HTML and CSS code
@@ -347,9 +354,116 @@ Overall, the design was intended and created to be clean, clear and professional
 ---   
 
 ## Deployment
+ 
+### Prerequisites
 
-### **How to deploy**  
+*   A Render account (create one at [https://render.com/](https://render.com/)).
+*   A Git repository (GitHub, GitLab, Bitbucket, etc.) containing your Django project.
+*   A working Django project with a `requirements.txt` file listing all dependencies.
 
+### Steps
+
+1.  **Prepare Your Project:**
+
+    *   **`requirements.txt`:** Ensure you have a `requirements.txt` file in your project's root directory. You can generate it using:
+
+        ```bash
+        pip freeze > requirements.txt
+        ```
+
+    *   **`Procfile` (Important):** Create a file named `Procfile` (no extension) in your project's root directory with the following content:
+
+        ```
+        web: gunicorn your_project_name.wsgi --bind 0.0.0.0:$PORT
+        ```
+
+        Replace `your_project_name` with the name of your Django project's main directory (the one containing `settings.py`).
+
+    *   **Static Files Configuration (Very Important):** Ensure your `settings.py` is configured for static files:
+
+        ```python
+        import os
+
+        BASE_DIR = Path(__file__).resolve().parent.parent
+
+        STATIC_URL = '/static/'
+        STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+        STATICFILES_DIRS = [
+            BASE_DIR / 'static', #if you have a static folder in the root
+        ]
+        ```
+
+        If you have static files in apps' static folders, make sure that `django.contrib.staticfiles` is in `INSTALLED_APPS` and use `{% load static %}` in your templates and `{% static 'path/to/file' %}` to reference them.
+
+    *   **Database Configuration:** Configure your database settings in `settings.py`. For PostgreSQL on Render, use environment variables:
+
+        ```python
+        import dj_database_url
+        import os
+
+        DATABASES = {
+            'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
+        }
+        ```
+
+    *   **ALLOWED_HOSTS:** Set `ALLOWED_HOSTS` in `settings.py`:
+
+        ```python
+        ALLOWED_HOSTS = ['*'] # ONLY FOR DEVELOPMENT. When you have a custom domain or render provides you with one, put that in here instead.
+        ```
+
+    *   **Collect Static Files (Before Committing):** Run the following command locally:
+
+        ```bash
+        python manage.py collectstatic
+        ```
+
+        Commit the `staticfiles` directory that is created.
+
+    *   **Commit Your Changes:** Commit all the changes to your Git repository.
+
+2.  **Create a Web Service on Render:**
+
+    *   Log in to your Render dashboard.
+    *   Click "New +" and select "Web Service".
+    *   Connect your Git repository.
+    *   Give your service a name.
+    *   Choose a region.
+    *   Select the "Python" environment.
+    *   Set the "Start Command" to: `gunicorn your_project_name.wsgi --bind 0.0.0.0:$PORT` (same as in your `Procfile`).
+    *   Choose a plan (Free or paid).
+
+3.  **Set Environment Variables (Database):**
+
+    *   In your Render service's settings, go to the "Environment" tab.
+    *   Add a new environment variable named `DATABASE_URL`.
+    *   For PostgreSQL, the value should be in the format: `postgres://<user>:<password>@<host>:<port>/<database>`
+    *   Render provides a PostgreSQL database addon which will give you this URL. Add the addon and Render will automatically add the `DATABASE_URL` environment variable.
+
+4.  **Deploy:**
+
+    *   Click "Save Changes" to deploy your service.
+
+5.  **Migrate Database:**
+
+    *   Once the deployment is complete, go to the "Shell" tab of your service on Render.
+    *   Run the database migrations:
+
+        ```bash
+        python manage.py migrate
+        ```
+
+6.  **Access Your Application:**
+
+    *   Render will provide you with a URL to access your deployed application.
+
+### Common Issues and Troubleshooting
+
+*   **Static Files Not Loading:** Double-check your `STATIC_URL`, `STATIC_ROOT`, `STATICFILES_DIRS` settings, and ensure you ran `python manage.py collectstatic` and committed the `staticfiles` directory.
+*   **Database Connection Errors:** Verify your `DATABASE_URL` environment variable is correct.
+*   **Deployment Errors:** Check the Render logs for any error messages.
+*   **`Procfile` Errors:** Make sure the `Procfile` is in the root directory and the command is correct.
+*   **`ALLOWED_HOSTS`:** Ensure `ALLOWED_HOSTS` is correctly set in your settings.py file. Setting it to `*` is only for testing. In production, it should be set to your domain.
 
 
 ### **Initial testing plan**
@@ -358,7 +472,7 @@ I planned for this site to be accessible and legible on all screen sizes. I will
 
 ### **Testing**    
 
-Testing took place throughout the entire build using the Python shell and in built django admin dashboard for the models & views logic. 
+Manual testing took place throughout the entire build using the Python shell and in built django admin dashboard for the models & views logic. 
 
 #### **Availabilities**
 Using the Python shell to create a slot, setting it to being available for booking by default:
@@ -400,13 +514,10 @@ Lighthouse website audit is available [here:](/docs/auditing)
 ## Credits  
   
 ### **Content References**
-- All content templates are generated by [ChatGPT](https://chatgpt.com/), but amended and finalised by me.
-- [Code Institute](https://codeinstitute.net/ie/), [Codecademy](https://www.codecademy.com/) and [Free Code Camp](https://www.freecodecamp.org/) for their HTML/CSS learning material.
+- Basic project was modelled from this tutorial: https://blog.devgenius.io/django-tutorial-on-how-to-create-a-booking-system-for-a-health-clinic-9b1920fc2b78. Used a combination of Gemini and chatGPT AIs to aid with repurposing to the tennis club where necessary.
+- [Code Institute](https://codeinstitute.net/ie/), for their django deployment guide, [Codecademy](https://www.codecademy.com/) and [Free Code Camp](https://www.freecodecamp.org/) for their HTML/CSS/Javascript/Python learning material.
 - [W3Schools](https://www.w3schools.com/) for additional learning material.
-- [MDN Web Docs](https://developer.mozilla.org/) for tutorials on html and css.
-
-
-### **Media References**  
+- [MDN Web Docs](https://developer.mozilla.org/) for tutorials on html, css, javascript and python.
   
 
 
