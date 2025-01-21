@@ -6,7 +6,7 @@ from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from .models import Court, Booking, Availability
 from datetime import datetime, time, timedelta, date
-import json  # Import json for pretty printing
+import json
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.core.exceptions import ValidationError
@@ -69,7 +69,7 @@ def book_slot(request):
         court_availability = []
         for start, end in time_slots:
             try:
-                availability = Availability.objects.get(  # Use .get() here
+                availability = Availability.objects.get(  
                     court=court, date=date_obj, start_time=start
                 )
                 if availability.is_within_booking_window():
@@ -90,10 +90,9 @@ def book_slot(request):
     context = {
         'courts': courts,
         'time_slots': time_slots,
-        'availability_data': availability_data,  # Now a dictionary
+        'availability_data': availability_data,
         'selected_date': date_obj,
     }
-    print(f"Availability Data (book_slots): {availability_data}")  # Print with indentation
     return render(request, 'bookings/book_slot.html', context)
 
 def make_booking(request):
@@ -168,7 +167,6 @@ def reschedule_booking(request):
     print("Reschedule view was called!")
     if request.method == 'POST':
         booking_id = request.POST.get('booking_id')
-        print(f"Booking ID from post: {booking_id}")
         if not booking_id:
             messages.error(request, "Booking ID is missing. Please try again.")
             return redirect('view_bookings')
@@ -176,9 +174,7 @@ def reschedule_booking(request):
         try:
             with transaction.atomic():
                 booking = get_object_or_404(Booking, pk=booking_id, user=request.user, is_active=True)
-                print(f"Original booking: {booking}")
                 old_availability = booking.availability
-                print(f"Old Availability: {old_availability} (is_available: {old_availability.is_available})")
 
                 new_date_str = request.POST.get('new_date')
                 new_time_str = request.POST.get('new_time')
@@ -186,31 +182,24 @@ def reschedule_booking(request):
                 try:
                     new_date = datetime.datetime.strptime(new_date_str, '%Y-%m-%d').date()
                     new_time = datetime.datetime.strptime(new_time_str, '%H:%M').time()
-                    print(f"New Date: {new_date}")
-                    print(f"New Time: {new_time}")
                 except ValueError as e:
-                    print(f"Datetime parsing error: {e}") # Print the specific error
                     messages.error(request, "Invalid date or time format. Please use YYYY-MM-DD and HH:MM.")
                     return redirect('view_bookings')
 
                 old_availability.is_available = True
                 old_availability.save()
-                print(f"Old Availability AFTER SAVE: {old_availability} (is_available: {old_availability.is_available})")
 
                 try:
                     new_availability = Availability.objects.get(court=booking.court, date=new_date, start_time=new_time, is_available=True)
-                    print(f"New Availability: {new_availability} (is_available: {new_availability.is_available})")
                 except Availability.DoesNotExist:
                     old_availability.is_available = False
                     old_availability.save()
-                    print("New Availability DOES NOT EXIST")
                     messages.error(request, "Selected availability not found.")
                     return redirect('view_bookings')
 
                 if Booking.objects.filter(court=booking.court, booking_time=new_time, booking_date=new_date, is_active=True).exclude(pk=booking.pk).exists():
                     old_availability.is_available = False
                     old_availability.save()
-                    print("New Availability is booked")
                     messages.error(request, "This slot is already booked.")
                     return redirect('view_bookings')
 
@@ -218,20 +207,16 @@ def reschedule_booking(request):
                 booking.booking_time = new_time
                 booking.availability = new_availability
                 booking.save()
-                print(f"Booking AFTER SAVE: {booking}")
 
                 new_availability.is_available = False
                 new_availability.save()
-                print(f"New Availability AFTER SAVE: {new_availability} (is_available: {new_availability.is_available})")
 
                 messages.success(request, "Booking rescheduled successfully.")
                 return redirect('view_bookings')
 
         except Exception as e:
-            print(f"An unexpected error occurred: {e}")
             messages.error(request, f"An unexpected error occurred: {e}")
             return redirect('view_bookings')
-    print(f"Availability Data (dashboard): {availability_data}")
     return redirect('view_bookings')
 
 @login_required
@@ -271,7 +256,5 @@ def dashboard(request):
         'selected_date': selected_date,  # Date to display
     }
 
-    print("Time Slots:", time_slots)
-    print("Courts:", courts)
     return render(request, 'bookings/dashboard.html', context)
 
