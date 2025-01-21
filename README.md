@@ -290,6 +290,23 @@ Overall, the design was intended and created to be clean, clear and professional
 - By using this approach, I knew the feature worked at every stage before moving on, so if an error emerged I knew exactly where to focus on for bug fixes.
 - By separating each feature and building in isolation, I anticipate it will make integrating the whole project together to be a smoother process, as I will be confident that each feature works as intended.
 
+  #### **ERD**
+
+  Entities:
+
+| Entity      | Attributes                                                                                                  |
+| ----------- | --------------------------------------------------------------------------------------------------------- |
+| Court       | court_number (PK, unique), court_type                                                                       |
+| Availability| id (PK), date, start_time, end_time, is_available, court_id (FK)                                             |
+| Booking     | id (PK), booking_date, booking_time, duration, is_active, user_id (FK), booked_by_id(FK), court_id(FK), availability_id (FK) |
+| User        | id (PK), username (Unique), email, first_name, last_name, password |
+
+Relationships:
+
+*   Court 1:N Availability
+*   User 1:N Booking
+*   Availability 1:N Booking
+
 ---
 
 ## Tablet & Mobile View  
