@@ -25,7 +25,7 @@ class Availability(models.Model):
 
     @classmethod
     def create_default_availability(cls, days=7, start_time=time(8, 0), end_time=time(22, 0)):
-        """Creates default availability for the next 'days' days."""
+        """Creates default availability for the next '7' days."""
         courts = Court.objects.all()
         for day_offset in range(days):
             target_date = timezone.localdate() + timedelta(days=day_offset)
@@ -41,7 +41,7 @@ class Availability(models.Model):
                     )
 
     def is_within_booking_window(self, days=7):
-        """Checks if the availability date is within the next 'days' days."""
+        """Checks if the availability date is within the next 7 days."""
         return self.date <= timezone.localdate() + timedelta(days=days)
 
     def __str__(self):
@@ -52,11 +52,12 @@ class Availability(models.Model):
 
 
 class Booking(models.Model):
+    """Logic for a user to create bookings"""
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='my_bookings')
-    booked_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='assigned_bookings')  # Changed to booked_by for clarity
-    court = models.ForeignKey(Court, on_delete=models.CASCADE) #You can remove this if you want
-    availability = models.ForeignKey(Availability, on_delete=models.CASCADE)  # Add this line
-    booking_date = models.DateField() #Add this line
+    booked_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='assigned_bookings')
+    court = models.ForeignKey(Court, on_delete=models.CASCADE) 
+    availability = models.ForeignKey(Availability, on_delete=models.CASCADE)  
+    booking_date = models.DateField() 
     booking_time = models.TimeField()
     duration = models.IntegerField()
     is_active = models.BooleanField(default=True)

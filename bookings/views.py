@@ -228,7 +228,7 @@ def dashboard(request):
     end_hour = 22
     time_slots = [(time(h, 0), time(h + 1, 0)) for h in range(start_hour, end_hour)]
 
-    now = timezone.now()  # Get the current time in the appropriate timezone
+    now = timezone.now()  # Get the current time
     bookings = Booking.objects.filter(
         user=request.user,
         booking_date__gte=now.date()  # Only bookings on or after today
