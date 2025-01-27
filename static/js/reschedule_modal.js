@@ -70,35 +70,15 @@ if (cancelCancelButton) {
 }
 
 // Reschedule Modal
-const rescheduleModal = document.getElementById("rescheduleModal");
-const rescheduleButtons = document.querySelectorAll(".reschedule-button");
-const rescheduleCloseButton = rescheduleModal.querySelector(".close-button");
+const rescheduleButtons = document.querySelectorAll('.reschedule-button');
 
 rescheduleButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        rescheduleModal.style.display = "block";
+    button.addEventListener('click', function() {
+        const bookingId = this.dataset.bookingId;
+        const rescheduleUrl = this.dataset.rescheduleUrl; // Assuming this is set using {% url %}
+
+        window.location.href = `${rescheduleUrl}?reschedule_id=${bookingId}`;
     });
-});
-
-rescheduleCloseButton.addEventListener('click', () => {
-    rescheduleModal.style.display = "none";
-});
-
-window.onclick = function(event) {
-    if (event.target == rescheduleModal) {
-        rescheduleModal.style.display = "none";
-    }
-};
-
-const dateForm = document.querySelector("#rescheduleModal form"); // Select the form inside the modal
-
-dateForm.addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevent form submission
-    // Here you can handle what happens after the user selects a date
-    const selectedDate = document.getElementById('date').value;
-    console.log("Selected date:", selectedDate);
-    // You can now update the availability data here if needed
-    // For now, let's just log the selected date and keep the modal open
 });
 
 // Close modals when clicking outside
