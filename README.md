@@ -343,6 +343,9 @@ Relationships:
 - Change membership functionality to allow anyone to book a court but give priority to a member (e.g members can book 10 days in advance rather than 7, and members get a 10% discount)
 - Add a calendar to see upcoming events at the club
 - Add a blog/news section to describe events which have happened at the club
+- Be able to book more than one slot at a time, using an 'add to basket' system
+- Be able to book slots on the half hour (e.g. 10.30-11.30)
+- Be able to book slots for different time frames (e.g. 90 minutes)
   
 ## Technologies Used    
 
@@ -509,15 +512,18 @@ OUTPUT: True
 ### **Learning Points** 
 
 #### **Use of AI**
-
+- AI was primarily used for debugging and guidance on transferring elements the reference project (the medical booking system linked in credits) to be appropriate for a tennis club
+- Gemini was used to generate the automated tests
 
 
 #### **What Went Well & Even Better If**
 ##### **WWW**
-
+- The project achieved its MVP and works as a system for booking tennis courts
+- Good use of AI throughout, used chatGPT and Gemini against each other to help debug their own generated codes and carefully amended naming conventions as in previous projects I've not done that and got lost in a web 
 
 ##### **EBI**
-
+- Project diverged slightly from the plan. e.g. I planned to have rescheduling pop up as a modal but I wasn't able to do that.
+- Code could be cleaner in places
 
 ### **HTML and CSS Validation using W3C Validation**  
 
