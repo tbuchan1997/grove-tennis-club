@@ -49,13 +49,13 @@
                 <p>Are you sure you want to cancel this booking?</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Go Back</button>
+                <button id="cancelCancelButton" type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Go Back</button>
                 <button id="confirmCancelButton" type="button" class="btn btn-danger">Yes, Cancel</button>
             </div>
         </div>
     </div>
 </div>
 
-<script src="{% static 'js/dashboard.js' %}"></script>  {# Use a new script file #}
+<script src="{% static 'js/reschedule_modal.js' %}"></script>
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
 {% endblock %}

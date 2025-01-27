@@ -22,6 +22,12 @@ const confirmCancelButton = document.getElementById("confirmCancelButton");
 const cancelCancelButton = document.getElementById("cancelCancelButton")
 let bookingIdToCancel = null;
 
+if (cancelCancelButton) {
+    cancelCancelButton.addEventListener('click', () => {
+      cancelModal.style.display = "none";
+    });
+  }
+
 cancelButtons.forEach(button => {
     button.addEventListener('click', (event) => {
         event.preventDefault();
